@@ -124,6 +124,7 @@ Or install it yourself as:
 ## To Do
 
   * Test assertion of valid parameters
+  * Make 1.8.7/ree/rbx compatible
   * Write rdocs
   * Document or remove default `parent` option for `from:` option
   * Properly support inheriting associations
