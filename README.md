@@ -1,10 +1,6 @@
-## Description
+## attr_inherited - Attribute inheritance for your `ActiveRecord` models
 
-Attribute inheritance for `ActiveRecord` models
-
-Using `attr_inherited` allows your `ActiveRecord` models to inherit any of their attributes from an associated, or parent model.
-
-
+With the `attr_inherited` gem, your `ActiveRecord` models can inherit any of their attributes from an associated, model.
 
 ## Usage
 
@@ -15,27 +11,26 @@ Using `attr_inherited` allows your `ActiveRecord` models to inherit any of their
 Given a `Post` model and the following `Version` model
 
     class Version < ActiveRecord::Base
-      belongs_to  :post
-
+      belongs_to     :post
       attr_inherited :title, :synopsis, from: :post
     end
 
-..then `Version` will now inherit `title` and `synopsis` from the parent post, if either attributes are `nil`
+..then `Version` will inherit `title` and `synopsis` from the associated `post`, when the attributes are `nil`
 
-    1.9.3p194 :001 > post = Post.create!(title: "First post", synopsis: "First post synopsis")
-    1.9.3p194 :002 > version = Version.create!(post: post)
-
-    1.9.3p194 :003 > version.title
+    post = Post.create!(title: "First post", synopsis: "First post synopsis")
+    version = Version.create!(post: post)
+    
+    version.title
      => "First post"
 
-    1.9.3p194 :004 > version.body
+    version.body
      => "First post body"
 
 You can override any of the inherited attributes by setting its a value to anything other than `nil`
 
-    1.9.3p194 :005 > version.update_attributes(description: "Version synopsis")
-
-    1.9.3p194 :006 > version.synopsis
+    version.update_attributes(description: "Version synopsis")
+    
+    version.synopsis
      => "Version description"
 
 ### Renaming inherited attributes
@@ -48,10 +43,10 @@ If you want the inherited attribute to have a name other than that of the associ
       attr_inherited :synopsis, from: :post, as: :description
     end
 
-    1.9.3p194 :001 > post = Post.create!(synopsis: "First post synopsis")
-    1.9.3p194 :002 > version = Version.create!(post: post)
-
-    1.9.3p194 :003 > version.description
+    post = Post.create!(synopsis: "First post synopsis")
+    version = Version.create!(post: post)
+    
+    version.description
      => "First post synopsis"
 
 Note that `description` must be an attribute of `Version` for the above to work.
@@ -66,14 +61,14 @@ You might want to inherit an attribute not only when it is `nil` but even when i
       attr_inherited :title, from: :post, when: :blank?
     end
 
-    1.9.3p194 :001 > post = Post.create!(title: "First post")
-    1.9.3p194 :002 > version = Version.create!(post: post)
-
-    1.9.3p194 :003 > version.title
+    post = Post.create!(title: "First post")
+    version = Version.create!(post: post)
+    
+    version.title
      => "First post"
 
-    1.9.3p194 :004 > version.update_attributes(title: "     ")
-    1.9.3p194 :005 > version.title
+    version.update_attributes(title: "     ")
+    version.title
      => "First post"
 
 ### Using the `when:` option to fake has_many association inheritance
@@ -93,15 +88,15 @@ Until real association inheritance is implemented you can fake it like this:
 
 ...which makes `comments` behave almost as if it was inherited from `Post`:
 
-    1.9.3p194 :001 > post = Post.create!(title: "First post")
-    1.9.3p194 :002 > post.comments.create(text: "Post comment")
+    post = Post.create!(title: "First post")
+    post.comments.create(text: "Post comment")
     
-    1.9.3p194 :003 > version = Version.create!(post: post)
-    1.9.3p194 :004 > version.comments.first.text
+    version = Version.create!(post: post)
+    version.comments.first.text
      => "Post comment"
 
-    1.9.3p194 :005 > version.comments = [Comment.create(text: "Version comment")]
-    1.9.3p194 :006 > version.comments.first.text
+    version.comments = [Comment.create(text: "Version comment")]
+    version.comments.first.text
      => "Version comment"
 
 **Caveat**: You can't call any other association methods on `version.comments` when it is inherited, such as `<<`, `.create`, `.build`
