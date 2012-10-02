@@ -19,19 +19,19 @@ Given a `Post` model and the following `Version` model
 
     post = Post.create!(title: "First post", synopsis: "First post synopsis")
     version = Version.create!(post: post)
-    
+
     version.title
      => "First post"
 
-    version.body
-     => "First post body"
+    version.synopsis
+     => "First post synopsis"
 
 You can override any of the inherited attributes by setting its a value to anything other than `nil`
 
-    version.update_attributes(description: "Version synopsis")
-    
+    version.update_attributes(synopsis: "Version synopsis")
+
     version.synopsis
-     => "Version description"
+     => "Version synopsis"
 
 ### Renaming inherited attributes
 
@@ -45,9 +45,14 @@ If you want the inherited attribute to have a name other than that of the associ
 
     post = Post.create!(synopsis: "First post synopsis")
     version = Version.create!(post: post)
-    
+
     version.description
      => "First post synopsis"
+
+    version.update_attributes(description: "Version description")
+
+    version.description
+     => "Version description"
 
 Note that `description` must be an attribute of `Version` for the above to work.
 
@@ -63,7 +68,7 @@ You might want to inherit an attribute not only when it is `nil` but even when i
 
     post = Post.create!(title: "First post")
     version = Version.create!(post: post)
-    
+
     version.title
      => "First post"
 
@@ -90,7 +95,7 @@ Until real association inheritance is implemented you can fake it like this:
 
     post = Post.create!(title: "First post")
     post.comments.create(text: "Post comment")
-    
+
     version = Version.create!(post: post)
     version.comments.first.text
      => "Post comment"
@@ -122,6 +127,12 @@ Or install it yourself as:
 **1.0.0** Initial relase (2012-10-02)
 
 ## To Do
+
+  * Implement `_inherited?`
+
+      def #{_alias}_inherited?
+        #{_parent}.#{attr} == self.#{attr}
+      end
 
   * Test assertion of valid parameters
   * Make 1.8.7/ree/rbx compatible
